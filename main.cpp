@@ -262,6 +262,13 @@ int main() {
         book.ChangePhoneNumber(Person { "Kotov", "Vasilii", "Eliseevich" }, PhoneNumber { 7, 123, "15344458", nullopt });
         book.ChangePhoneNumber(Person { "Mironova", "Margarita", "Vladimirovna" }, PhoneNumber { 16, 465, "9155448", 13 });
 
+        cout << "----ChangePhoneNumber----" << endl;
+
+        book.ChangePhoneNumber(Person{ "Kotov", "Vasilii", "Eliseevich" },
+                               PhoneNumber{7, 123, "15344458", nullopt});
+        book.ChangePhoneNumber(Person{ "Mironova", "Margarita", "Vladimirovna" },
+                               PhoneNumber{ 16, 465, "9155448", 13 });
+        cout << book;
     }
 
 
