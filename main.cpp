@@ -4,9 +4,6 @@
 #include "random"
 #include "chrono"
 #include "algorithm"
-#include "set"
-#include <future>
-
 
 using namespace std;
 
@@ -47,10 +44,10 @@ public:
     }
 
 };
-int32_t getSimpleNum(const int Limit) {
-    vector<int32_t> simpleNums;
+void getSimpleNum(const int Limit, int &count, int &result) {
 
     for (int i = 2; i < Limit; ++i) {
+        count++;
         bool isSimple = true;
 
         for (int tempJ = 2; tempJ < Limit; ++tempJ) {
@@ -61,16 +58,15 @@ int32_t getSimpleNum(const int Limit) {
         }
 
         if(isSimple) {
-            simpleNums.push_back(i);
+            result = i;
         }
     }
-
-    return *(simpleNums.end()-1);
 }
 
-void printNums(const int Nums) {
-    for (int i = 0; i < Nums; ++i) {
-        cout << i << endl;
+
+void printCount(const int &count, const int &total) {
+    while (count < total-2){
+        cout << "progress:" << static_cast<float>(count) / total * 100 << '\n';
     }
 }
 
@@ -81,7 +77,7 @@ int32_t getRandom() {
     return gen();
 }
 
-void addItem(vector<int> vec) {
+void addItem(vector<int> &vec) {
     for (int i = 0; i < 20; ++i) {
         this_thread::sleep_for(chrono::milliseconds(1000));
         // add random val
@@ -91,10 +87,10 @@ void addItem(vector<int> vec) {
     }
 }
 
-void removeItem(vector<int> vec) {
+void removeItem(vector<int> &vec) {
     for (int i = 0; i < 20; ++i) {
         this_thread::sleep_for(chrono::milliseconds (500));
-        cout << "size:" << vec.size() << endl;
+        //cout << "size:" << vec.size() << endl;
         if(vec.size()){
             cout << "remove el " << *max_element(vec.begin(), vec.end());
             vec.erase(max_element(vec.begin(), vec.end()));
@@ -104,8 +100,8 @@ void removeItem(vector<int> vec) {
 }
 
 int main(){
-
-    // Task 1
+//
+//    // Task 1
     thread th1(pcout, 1);
     thread th2(pcout, 2);
     thread th3(pcout, 3);
@@ -115,17 +111,27 @@ int main(){
 
 
     // Task 2
+    int countSimpleNum {0};
+    const int totalCountSimpleNum {1'000'00};
+    int result {0};
+
     Timer timer;
     timer.Start("Get Simple Num");
-    auto simple(async(launch::async, getSimpleNum, 1'000'000));
-    cout << simple.get() << '\n';
+    thread th4(getSimpleNum, ref(totalCountSimpleNum), ref(countSimpleNum), ref(result));
+    thread th5(printCount, ref(countSimpleNum), totalCountSimpleNum);
+    th4.detach();
+    th5.join();
+
+    cout << "result: " << result << '\n';
     timer.Print();
 
-    // Task 3
+
+//    // Task 3
     vector<int> Things;
-    thread Owner(addItem, Things);
-    thread Thief(removeItem, Things);
+    thread Owner(addItem, ref(Things));
+    thread Thief(removeItem, ref(Things));
     Owner.join();
     Thief.join();
+
     return 0;
 }
